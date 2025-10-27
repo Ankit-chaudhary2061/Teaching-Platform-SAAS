@@ -49,10 +49,13 @@
     "outDir": "./dist",
     // Environment Settings
     "module": "nodenext",
-    "moduleResolution": "nodenext", // Add for Node.js ESM resolution
+    "moduleResolution": "nodenext",
     "target": "esnext",
-    "types": ["node"], // Include Node.js types
-    "lib": ["esnext"], // Include ESNext libraries
+    "types": ["node", "sequelize"], // Add sequelize types
+    "lib": ["esnext"],
+    // Enable Decorators
+    "experimentalDecorators": true, // Required for decorators
+    "emitDecoratorMetadata": true, // Required for sequelize-typescript
     // Other Outputs
     "sourceMap": true,
     "declaration": true,
@@ -67,9 +70,9 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-   "allowImportingTsExtensions": true, // Allow .ts extensions
-    "noEmit": true // Add this
+    "allowImportingTsExtensions": true,
+    "noEmit": true // Suitable for type-checking only
   },
-  "include": ["src/**/*", "server.ts"], // Include server.ts explicitly
+  "include": ["src/**/*", "server.ts"],
   "exclude": ["node_modules", "dist"]
 }
