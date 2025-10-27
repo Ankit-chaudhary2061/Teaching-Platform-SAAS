@@ -1,7 +1,7 @@
 import app from "./src/app.ts";
 import dotenv from 'dotenv'
 dotenv.config()
-
+import './src/database/connection.ts'
 
 const StartServer = () => {
     const port = process.env.PORT; // PORT number is set in .env folder 
