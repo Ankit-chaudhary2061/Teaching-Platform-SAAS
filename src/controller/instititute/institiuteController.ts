@@ -10,7 +10,7 @@ class InstituteController {
       const instituteVatNo = req.body.instituteVatNo || null;
       const institutePanNo = req.body.institutePanNo || null;
 
-      // 1. Validate required fields
+      // 1. Make sure all required fields are filled
       if (!instituteAddress || !instituteEmail || !instituteName || !institutePhoneNumber) {
         return res.status(400).json({
           message: 'Please provide instituteName, instituteAddress, instituteEmail, and institutePhoneNumber'
@@ -46,7 +46,6 @@ class InstituteController {
         }
       );
 
-      // 5. Success response
       return res.status(201).json({
         message: 'Institute created successfully'
        
