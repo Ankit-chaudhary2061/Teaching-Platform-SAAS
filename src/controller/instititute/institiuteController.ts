@@ -118,7 +118,7 @@ class InstituteController {
         instituteNumber,
       });
     } catch (error: any) {
-  console.error('Create institute error:', error);
+    console.error('Create institute error:', error);
       return res.status(500).json({
         message: 'Server error',
         error: error.message
