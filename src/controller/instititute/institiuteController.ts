@@ -1,26 +1,31 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import sequelize from "../../database/connection.ts"; 
 import { QueryTypes } from "sequelize";
 import generateRandomInstituteNumber from "../../services/generateRandomNumber.ts"; 
+import { IExtendedRequest } from "../../middleWare/type.ts";
+import User from "../../database/model/userModels.ts";
 
 class InstituteController {
-  static async createInstitute(req: Request, res: Response) {
+  // ===============================
+  // Create Institute
+  // ===============================
+  static async createInstitute(req:IExtendedRequest, res: Response, next:NextFunction) {
     try {
       const { instituteName, instituteAddress, instituteEmail, institutePhoneNumber } = req.body;
       const instituteVatNo = req.body.instituteVatNo || null;
       const institutePanNo = req.body.institutePanNo || null;
 
-      // 1. Make sure all required fields are filled
+      //  Make sure all required fields are filled
       if (!instituteAddress || !instituteEmail || !instituteName || !institutePhoneNumber) {
         return res.status(400).json({
           message: 'Please provide instituteName, instituteAddress, instituteEmail, and institutePhoneNumber'
         });
       }
 
-      // 2. Generate unique institute number
+      // Generate unique institute number
       const instituteNumber = generateRandomInstituteNumber();
 
-      // 3. Create table with unique institute number
+      // Create table with unique institute number
       await sequelize.query(
         `CREATE TABLE IF NOT EXISTS institute_${instituteNumber}(
           id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -35,7 +40,7 @@ class InstituteController {
         )`
       );
 
-      // 4. Insert data into the newly created table
+      //  Insert data into the newly created table
       await sequelize.query(
         `INSERT INTO institute_${instituteNumber}(
           instituteName, instituteAddress, instituteEmail, institutePhoneNumber, instituteVatNo, institutePanNo
@@ -45,19 +50,80 @@ class InstituteController {
           type: QueryTypes.INSERT
         }
       );
+      //Create user_Institute table if not exists
+      await sequelize.query(`CREATE TABLE IF NOT EXISTS user_Institute(
+        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+        userId VARCHAR(244),
+        instituteNumber VARCHAR(255)
+        )`)
+
+        
+      if (req.user) {
+        await sequelize.query(
+          `INSERT INTO user_Institute(userId, instituteNumber) VALUES (?, ?)`,
+          {
+            replacements: [req.user.id, instituteNumber],
+            type: QueryTypes.INSERT,
+          }
+        );
+
+        // Update user info
+        await User.update(
+          {
+            currentInstituteNumber: instituteNumber,
+            role: "institute",
+          },
+          {
+            where: { id: req.user.id },
+          }
+        );
+      }
+
+      // Pass instituteNumber to next middleware
+      req.instituteNumber = instituteNumber;
+
+      next();
+    } catch (error: any) {
+      console.error("Create institute error:", error);
+      return res.status(500).json({
+        message: "Server error",
+        error: error.message,
+      });
+    
+    }
+  }
+  // ==============================
+  // Create Teacher Table 
+  // ==============================
+
+ static async createTeacher(req: IExtendedRequest, res: Response) {
+    try {
+      const instituteNumber = req.instituteNumber;
+
+      if (!instituteNumber) {
+        return res.status(400).json({ message: "Institute number is missing" });
+      }
+
+      await sequelize.query(`
+        CREATE TABLE IF NOT EXISTS teacher_${instituteNumber}(
+          id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+          teacherName VARCHAR(200) NOT NULL,
+          teacherAddress VARCHAR(255) NOT NULL,
+          teacherEmail VARCHAR(255) NOT NULL
+        )
+      `);
 
       return res.status(201).json({
-        message: 'Institute created successfully'
-       
+        message: "Institute and teacher table created successfully",
+        instituteNumber,
       });
-
     } catch (error: any) {
-      console.error('Create institute error:', error);
+  console.error('Create institute error:', error);
       return res.status(500).json({
         message: 'Server error',
         error: error.message
       });
-    }
+ }
   }
 }
 
