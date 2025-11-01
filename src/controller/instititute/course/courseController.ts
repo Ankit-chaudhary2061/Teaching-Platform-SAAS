@@ -13,8 +13,11 @@ class CourseController {
                 message:' please provide me all the mandatory data'
             })
         }
-        const courseThumbnail = null
-        const instituteNumber = req.instituteNumber
+        console.log(req.file , ': file ')
+        const courseThumbnail = req.file ? req.file.path : null;
+        const instituteNumber = req.user?.currentInstituteNumber
+       
+
         await sequelize.query(`INSERT INTO course_${instituteNumber}(
             courseName,coursePrice,courseDescription,courseDuration, courseLevel, courseThumbnail
         ) VALUES(?,?,?,?,?,?)`,
@@ -22,7 +25,8 @@ class CourseController {
             replacements:[courseName,coursePrice,courseDescription,courseDuration, courseLevel, courseThumbnail || '']
         })
         res.status(200).json({
-            message:'successfull courses is created '
+            message:'successfull courses is created ',
+
         })
        } catch (error: any) {
         console.error('Create course error:', error);
@@ -30,12 +34,15 @@ class CourseController {
         message: 'Server error',
          error: error.message,
         fullError: error,
+        stack: error.stack
+
       });
        }
     }
     static async deleteCourse(req:IExtendedRequest, res:Response){
         try {
-            const instituteNumber = req.instituteNumber
+            const instituteNumber = req.user?.currentInstituteNumber
+            
             const courseId = req.params.id
             await sequelize.query(`DELETE FROM course_${instituteNumber} WHERE id = ?`,{
                 replacements :[courseId],
@@ -47,11 +54,14 @@ class CourseController {
         message: 'Server error',
          error: error.message,
         fullError: error,
+        stack: error.stack
+
       });
         }
     }
     static async fetchCourse(req:IExtendedRequest, res:Response){
-        const instituteNumber = req.instituteNumber
+        const instituteNumber = req.user?.currentInstituteNumber
+
         const courseId = req.params.id
         const courses = await sequelize.query(`SELECT * FROM course_${instituteNumber} WHERE id = ?`,{replacements:[courseId],type:QueryTypes.SELECT})
         res.status(200).json({
@@ -61,7 +71,8 @@ class CourseController {
     }
     static async getAllSingleCourse (req:IExtendedRequest, res:Response){
         try {
-              const instituteNumber = req.instituteNumber
+        const instituteNumber = req.user?.currentInstituteNumber
+
         const courseId = req.params.id
          const [course] = await sequelize.query(`SELECT * FROM course_${instituteNumber} WHERE id = ?`,{replacements:[courseId],type:QueryTypes.SELECT})
          if(!course){
@@ -82,6 +93,8 @@ class CourseController {
         message: 'Server error',
          error: error.message,
         fullError: error,
+        stack: error.stack
+
       }); 
         }
     }

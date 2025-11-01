@@ -1,8 +1,9 @@
-import { Request } from "express"
+import { Request } from "express";
 
-export interface IExtendedRequest extends Request{
-    user?:{
-        id : string
-    },
-    instituteNumber?:string | number
+export interface IExtendedRequest extends Request {
+  user?: {
+    id: string;
+    currentInstituteNumber?: string | number;
+  };
+  
 }
