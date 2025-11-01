@@ -88,6 +88,7 @@ class InstituteController {
       return res.status(500).json({
         message: "Server error",
         error: error.message,
+        fullError: error,
       });
     
     }
@@ -96,7 +97,7 @@ class InstituteController {
   // Create Teacher Table 
   // ==============================
 
- static async createTeacher(req: IExtendedRequest, res: Response) {
+ static async createTeacher(req: IExtendedRequest, res: Response, next:NextFunction) {
     try {
       const instituteNumber = req.instituteNumber;
 
@@ -104,27 +105,105 @@ class InstituteController {
         return res.status(400).json({ message: "Institute number is missing" });
       }
 
-      await sequelize.query(`
-        CREATE TABLE IF NOT EXISTS teacher_${instituteNumber}(
-          id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-          teacherName VARCHAR(200) NOT NULL,
-          teacherAddress VARCHAR(255) NOT NULL,
-          teacherEmail VARCHAR(255) NOT NULL
-        )
-      `);
+    await sequelize.query(`
+  CREATE TABLE IF NOT EXISTS teacher_${instituteNumber} (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    teacherName VARCHAR(200) NOT NULL,
+    teacherAddress VARCHAR(255),
+    teacherEmail VARCHAR(255) NOT NULL,
+    teacherExperties VARCHAR(255),
+    teacherPhoneNumber VARCHAR(255) NOT NULL,
+    joined DATE,
+    salary VARCHAR(100),
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  )
+`);
 
+        next()
       return res.status(201).json({
         message: "Institute and teacher table created successfully",
         instituteNumber,
       });
     } catch (error: any) {
-    console.error('Create institute error:', error);
+    console.error('Create student error:', error);
       return res.status(500).json({
         message: 'Server error',
-        error: error.message
+         error: error.message,
+        fullError: error,
       });
  }
   }
+   // ==============================
+  // Create Student Table 
+  // ==============================
+  static async createStudent(req:IExtendedRequest, res:Response, next:NextFunction){
+    try {
+      const instituteNumber = req.instituteNumber;
+
+      if (!instituteNumber) {
+        return res.status(400).json({ message: "Institute number is missing" });
+      }
+      await sequelize.query(`CREATE TABLE IF NOT EXISTS student_${instituteNumber}(
+       id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+      studentName VARCHAR(255) NOT NULL,
+      studentAddress VARCHAR(255),
+      studentPhoneNumber VARCHAR(255),
+      enrolledDate DATE,
+      studentImage VARCHAR(255),
+      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )`)
+      next()
+    } catch (error :any) {
+      console.error('Create student error:', error);
+      return res.status(500).json({
+        message: 'Server error',
+         error: error.message,
+        fullError: error,
+      });
+    }
+
+  }
+  // ==============================
+  // Create Student Table 
+  // ==============================
+  static async createCourseTable(req:IExtendedRequest, res:Response){
+   try {
+       const instituteNumber = req.instituteNumber;
+
+      if (!instituteNumber) {
+        return res.status(400).json({ message: "Institute number is missing" });
+      }
+     await sequelize.query(`
+      CREATE TABLE IF NOT EXISTS course_${instituteNumber} (
+        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        courseName VARCHAR(222) NOT NULL UNIQUE,
+        coursePrice VARCHAR(255) NOT NULL,
+        courseDuration VARCHAR(222),
+        courseLevel ENUM('beginner', 'average', 'advance'),
+        courseDescription TEXT,
+        courseThumbnail VARCHAR(255)
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
+
+     return res.status(200).json({
+        message: "Institute  created successfully",
+        instituteNumber,
+      });
+   } catch (error : any) {
+     console.error('Create course error:', error);
+      return res.status(500).json({
+        message: 'Server error',
+         error: error.message,
+        fullError: error,
+      });
+    }
+
+  }
+
 }
 
 export default InstituteController;
