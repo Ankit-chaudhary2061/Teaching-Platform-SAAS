@@ -80,7 +80,12 @@ class InstituteController {
       }
 
       // Pass instituteNumber to next middleware
-      req.instituteNumber = instituteNumber;
+     if (req.user) {
+  req.user.currentInstituteNumber = instituteNumber;
+  
+}
+
+      
 
       next();
     } catch (error: any) {
@@ -89,6 +94,8 @@ class InstituteController {
         message: "Server error",
         error: error.message,
         fullError: error,
+        stack: error.stack
+
       });
     
     }
@@ -99,7 +106,7 @@ class InstituteController {
 
  static async createTeacher(req: IExtendedRequest, res: Response, next:NextFunction) {
     try {
-      const instituteNumber = req.instituteNumber;
+      const instituteNumber = req.user?.currentInstituteNumber;
 
       if (!instituteNumber) {
         return res.status(400).json({ message: "Institute number is missing" });
@@ -120,17 +127,16 @@ class InstituteController {
   )
 `);
 
-        next()
-      return res.status(201).json({
-        message: "Institute and teacher table created successfully",
-        instituteNumber,
-      });
+  next()
+     
     } catch (error: any) {
     console.error('Create student error:', error);
       return res.status(500).json({
         message: 'Server error',
          error: error.message,
         fullError: error,
+        stack: error.stack
+
       });
  }
   }
@@ -139,66 +145,99 @@ class InstituteController {
   // ==============================
   static async createStudent(req:IExtendedRequest, res:Response, next:NextFunction){
     try {
-      const instituteNumber = req.instituteNumber;
+     const instituteNumber = req.user?.currentInstituteNumber;
 
       if (!instituteNumber) {
         return res.status(400).json({ message: "Institute number is missing" });
       }
-      await sequelize.query(`CREATE TABLE IF NOT EXISTS student_${instituteNumber}(
-       id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-      studentName VARCHAR(255) NOT NULL,
-      studentAddress VARCHAR(255),
-      studentPhoneNumber VARCHAR(255),
-      enrolledDate DATE,
-      studentImage VARCHAR(255),
-      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      )`)
-      next()
+
+      await sequelize.query(`
+        CREATE TABLE IF NOT EXISTS student_${instituteNumber} (
+          id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+          studentName VARCHAR(255) NOT NULL,
+          studentAddress VARCHAR(255),
+          studentPhoneNumber VARCHAR(255),
+          enrolledDate DATE,
+          studentImage VARCHAR(255),
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )
+      `);
+
+      next();
     } catch (error :any) {
       console.error('Create student error:', error);
       return res.status(500).json({
         message: 'Server error',
          error: error.message,
         fullError: error,
+        stack: error.stack
+
       });
     }
 
   }
   // ==============================
-  // Create Student Table 
+  // Create Course Table 
   // ==============================
   static async createCourseTable(req:IExtendedRequest, res:Response){
    try {
-       const instituteNumber = req.instituteNumber;
+   const instituteNumber = req.user?.currentInstituteNumber;
 
       if (!instituteNumber) {
         return res.status(400).json({ message: "Institute number is missing" });
       }
-     await sequelize.query(`
-      CREATE TABLE IF NOT EXISTS course_${instituteNumber} (
-        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        courseName VARCHAR(222) NOT NULL UNIQUE,
-        coursePrice VARCHAR(255) NOT NULL,
-        courseDuration VARCHAR(222),
-        courseLevel ENUM('beginner', 'average', 'advance'),
-        courseDescription TEXT,
-        courseThumbnail VARCHAR(255)
-        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      )
-    `);
 
-     return res.status(200).json({
-        message: "Institute  created successfully",
+      await sequelize.query(`
+        CREATE TABLE IF NOT EXISTS course_${instituteNumber} (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          courseName VARCHAR(222) NOT NULL UNIQUE,
+          coursePrice VARCHAR(255) NOT NULL,
+          courseDuration VARCHAR(222),
+          courseLevel ENUM('beginner', 'average', 'advance'),
+          courseDescription TEXT,
+          courseThumbnail VARCHAR(255),
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )
+      `);
+
+      // ✅ only now send the success response (after all tables created)
+      return res.status(201).json({
+        message: "Institute and all related tables created successfully ✅",
         instituteNumber,
       });
    } catch (error : any) {
      console.error('Create course error:', error);
       return res.status(500).json({
         message: 'Server error',
-         error: error.message,
-        fullError: error,
+       fullError: error, 
+        stack: error.stack
+      });
+    }
+
+  }
+  static async createCategoryTable(req:IExtendedRequest , res:Response, next:NextFunction) {
+    try {
+    const institituteNumber = req.user?.currentInstituteNumber
+    await sequelize.query(`CREATE TABLE IF NOT EXISTS category_${institituteNumber}(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    categoryName VARCHAR(100) NOT NULL,
+    categoryDescription TEXT,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      
+    )`)
+    
+
+    next()
+      
+    } catch (error : any) {
+       console.error('Create category error:', error);
+      return res.status(500).json({
+       message: 'Server error',
+       fullError: error, 
+        stack: error.stack
       });
     }
 
