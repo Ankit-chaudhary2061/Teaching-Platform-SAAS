@@ -28,7 +28,8 @@ class InstituteController {
       // Create table with unique institute number
       await sequelize.query(
         `CREATE TABLE IF NOT EXISTS institute_${instituteNumber}(
-          id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+          
           instituteName VARCHAR(200) NOT NULL,
           instituteAddress VARCHAR(255) NOT NULL,
           instituteEmail VARCHAR(255) NOT NULL,
@@ -114,7 +115,8 @@ class InstituteController {
 
     await sequelize.query(`
   CREATE TABLE IF NOT EXISTS teacher_${instituteNumber} (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    
     teacherName VARCHAR(200) NOT NULL,
     teacherAddress VARCHAR(255),
     teacherEmail VARCHAR(255) NOT NULL,
@@ -153,7 +155,7 @@ class InstituteController {
 
       await sequelize.query(`
         CREATE TABLE IF NOT EXISTS student_${instituteNumber} (
-          id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+             id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
           studentName VARCHAR(255) NOT NULL,
           studentAddress VARCHAR(255),
           studentPhoneNumber VARCHAR(255),
@@ -190,13 +192,15 @@ class InstituteController {
 
       await sequelize.query(`
         CREATE TABLE IF NOT EXISTS course_${instituteNumber} (
-          id INT AUTO_INCREMENT PRIMARY KEY,
+          id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+          
           courseName VARCHAR(222) NOT NULL UNIQUE,
           coursePrice VARCHAR(255) NOT NULL,
           courseDuration VARCHAR(222),
           courseLevel ENUM('beginner', 'average', 'advance'),
           courseDescription TEXT,
           courseThumbnail VARCHAR(255),
+          categoryId VARCHAR(36) NOT NULL REFERENCES category_${instituteNumber} (id),
           createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         )
@@ -221,7 +225,7 @@ class InstituteController {
     try {
     const institituteNumber = req.user?.currentInstituteNumber
     await sequelize.query(`CREATE TABLE IF NOT EXISTS category_${institituteNumber}(
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
     categoryName VARCHAR(100) NOT NULL,
     categoryDescription TEXT,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

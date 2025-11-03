@@ -19,9 +19,9 @@ const upload = multer({
 const router: Router = express.Router()
 
 router.post('/course',MiddleWare.isLogedIn,upload.single('courseThumbnail'),CourseController.createCourse )
-router.get('/course',CourseController.fetchCourse )
-router.get('/course/:id',CourseController.getAllSingleCourse )
-router.delete('/course/:id',CourseController.deleteCourse )
+router.get('/course',MiddleWare.isLogedIn,CourseController.fetchCourse )
+router.get('/course/:id',MiddleWare.isLogedIn,CourseController.getAllSingleCourse )
+router.delete('/course/:id',MiddleWare.isLogedIn,CourseController.deleteCourse )
 
 
 

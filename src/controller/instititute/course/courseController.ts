@@ -7,8 +7,8 @@ import { QueryTypes } from 'sequelize';
 class CourseController {
     static async createCourse(req:IExtendedRequest, res:Response){
        try {
-        const { courseName, coursePrice,courseDescription, courseDuration, courseLevel} = req.body
-        if(!courseName || ! courseDescription || ! courseDuration || ! coursePrice|| ! courseLevel){
+        const { courseName, coursePrice,courseDescription, courseDuration, courseLevel, categoryId} = req.body
+        if(!courseName || ! courseDescription || ! courseDuration || ! coursePrice|| ! courseLevel || ! categoryId){
             return res.status(400).json({
                 message:' please provide me all the mandatory data'
             })
@@ -19,10 +19,11 @@ class CourseController {
        
 
         await sequelize.query(`INSERT INTO course_${instituteNumber}(
-            courseName,coursePrice,courseDescription,courseDuration, courseLevel, courseThumbnail
-        ) VALUES(?,?,?,?,?,?)`,
+            courseName,coursePrice,courseDescription,courseDuration, courseLevel, courseThumbnail, categoryId
+        ) VALUES(?,?,?,?,?,?,?)`,
         {
-            replacements:[courseName,coursePrice,courseDescription,courseDuration, courseLevel, courseThumbnail || '']
+            replacements:[courseName,coursePrice,courseDescription,courseDuration, courseLevel, courseThumbnail || '', categoryId],
+            type:QueryTypes.INSERT
         })
         res.status(200).json({
             message:'successfull courses is created ',
@@ -63,7 +64,7 @@ class CourseController {
         const instituteNumber = req.user?.currentInstituteNumber
 
         const courseId = req.params.id
-        const courses = await sequelize.query(`SELECT * FROM course_${instituteNumber} WHERE id = ?`,{replacements:[courseId],type:QueryTypes.SELECT})
+        const courses = await sequelize.query(`SELECT * FROM course_${instituteNumber} JOIN category_${instituteNumber} ON course_${instituteNumber}.categoryId = category_${instituteNumber}.id`,{type:QueryTypes.SELECT})
         res.status(200).json({
             message : 'Course fetched',
             data : courses

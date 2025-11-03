@@ -5,7 +5,7 @@ import User from "./model/userModels.ts";
 const dialect: Dialect = (process.env.DB_DIALECT as Dialect) || 'mysql';
 
 const sequelize = new Sequelize({
-  database: process.env.DB_NAME || 'teaching-pathsala',
+  database: process.env.DB_NAME || 'teaching-platform',
   username: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   host: process.env.DB_HOST || 'localhost',
