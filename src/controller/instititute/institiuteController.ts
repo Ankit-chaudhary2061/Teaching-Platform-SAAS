@@ -28,8 +28,7 @@ class InstituteController {
       // Create table with unique institute number
       await sequelize.query(
         `CREATE TABLE IF NOT EXISTS institute_${instituteNumber}(
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-          
+          id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
           instituteName VARCHAR(200) NOT NULL,
           instituteAddress VARCHAR(255) NOT NULL,
           instituteEmail VARCHAR(255) NOT NULL,
@@ -114,16 +113,17 @@ class InstituteController {
       }
 
     await sequelize.query(`
-  CREATE TABLE IF NOT EXISTS teacher_${instituteNumber} (
+    CREATE TABLE IF NOT EXISTS teacher_${instituteNumber} (
     id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    
     teacherName VARCHAR(200) NOT NULL,
     teacherAddress VARCHAR(255),
     teacherEmail VARCHAR(255) NOT NULL,
     teacherExperties VARCHAR(255),
     teacherPhoneNumber VARCHAR(255) NOT NULL,
-    joined DATE,
-    salary VARCHAR(100),
+    teacherJoined DATE,
+    teacherSalary VARCHAR(100),
+    teacherPhoto VARCHAR(255),
+    teacherPassword VARCHAr(255),
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   )
@@ -154,8 +154,8 @@ class InstituteController {
       }
 
       await sequelize.query(`
-        CREATE TABLE IF NOT EXISTS student_${instituteNumber} (
-             id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+          CREATE TABLE IF NOT EXISTS student_${instituteNumber} (
+          id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
           studentName VARCHAR(255) NOT NULL,
           studentAddress VARCHAR(255),
           studentPhoneNumber VARCHAR(255),
@@ -191,24 +191,24 @@ class InstituteController {
       }
 
       await sequelize.query(`
-        CREATE TABLE IF NOT EXISTS course_${instituteNumber} (
+          CREATE TABLE IF NOT EXISTS course_${instituteNumber} (
           id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-          
           courseName VARCHAR(222) NOT NULL UNIQUE,
           coursePrice VARCHAR(255) NOT NULL,
           courseDuration VARCHAR(222),
           courseLevel ENUM('beginner', 'average', 'advance'),
           courseDescription TEXT,
           courseThumbnail VARCHAR(255),
+          teacherId VARCHAR(36)  REFERENCES teacher_${instituteNumber} (id),
           categoryId VARCHAR(36) NOT NULL REFERENCES category_${instituteNumber} (id),
           createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         )
       `);
 
-      // ✅ only now send the success response (after all tables created)
+      //  only now send the success response (after all tables created)
       return res.status(201).json({
-        message: "Institute and all related tables created successfully ✅",
+        message: "Institute and all related tables created successfully ",
         instituteNumber,
       });
    } catch (error : any) {
@@ -221,6 +221,9 @@ class InstituteController {
     }
 
   }
+  // ==============================
+  // Create Category Table 
+  // ==============================
   static async createCategoryTable(req:IExtendedRequest , res:Response, next:NextFunction) {
     try {
     const institituteNumber = req.user?.currentInstituteNumber
