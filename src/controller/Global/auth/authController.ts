@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import User from "../../../database/model/userModels.ts";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken'
-
+import generateJwtToken from "../../../services/generateJwtToken.ts";
 class AuthController {
   // =======================
   // Register User
@@ -85,7 +85,7 @@ class AuthController {
       // 2. Compare the entered password with the stored (hashed) password
       const passwordMatch = await bcrypt.compareSync(password, userData.password);
       if (passwordMatch) {
-       const token= jwt.sign({id:userData.id}, process.env.SECRET_KEY as string,{expiresIn:'30d'})
+       const token= generateJwtToken({id: userData.id})
          res.status(200).json({
             token,
         message: "Login successful",
