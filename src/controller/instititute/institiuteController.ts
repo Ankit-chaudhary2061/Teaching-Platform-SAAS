@@ -112,22 +112,22 @@ class InstituteController {
         return res.status(400).json({ message: "Institute number is missing" });
       }
 
-    await sequelize.query(`
-    CREATE TABLE IF NOT EXISTS teacher_${instituteNumber} (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    teacherName VARCHAR(200) NOT NULL,
-    teacherAddress VARCHAR(255),
-    teacherEmail VARCHAR(255) NOT NULL,
-    teacherExperties VARCHAR(255),
-    teacherPhoneNumber VARCHAR(255) NOT NULL,
-    teacherJoined DATE,
-    teacherSalary VARCHAR(100),
-    teacherPhoto VARCHAR(255),
-    teacherPassword VARCHAr(255),
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-  )
-`);
+     await sequelize.query(`
+      CREATE TABLE IF NOT EXISTS teacher_${instituteNumber} (
+        id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+        teacherName VARCHAR(200) NOT NULL,
+        teacherAddress VARCHAR(255),
+        teacherEmail VARCHAR(255) NOT NULL,
+        teacherExpertise VARCHAR(255),
+        teacherPhoneNumber VARCHAR(255) NOT NULL,
+        teacherJoined DATE,
+        teacherSalary VARCHAR(100),
+        teacherPhoto VARCHAR(255),
+        teacherPassword VARCHAR(255),
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
 
   next()
      
