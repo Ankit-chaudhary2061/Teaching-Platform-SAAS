@@ -104,44 +104,77 @@ class InstituteController {
   // Create Teacher Table 
   // ==============================
 
- static async createTeacher(req: IExtendedRequest, res: Response, next:NextFunction) {
-    try {
-      const instituteNumber = req.user?.currentInstituteNumber;
+//  static async createTeacher(req: IExtendedRequest, res: Response, next:NextFunction) {
+//     try {
+//       const instituteNumber = req.user?.currentInstituteNumber;
 
-      if (!instituteNumber) {
-        return res.status(400).json({ message: "Institute number is missing" });
-      }
+//       if (!instituteNumber) {
+//         return res.status(400).json({ message: "Institute number is missing" });
+//       }
 
-     await sequelize.query(`
-      CREATE TABLE IF NOT EXISTS teacher_${instituteNumber} (
-        id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-        teacherName VARCHAR(200) NOT NULL,
-        teacherAddress VARCHAR(255),
-        teacherEmail VARCHAR(255) NOT NULL,
-        teacherExpertise VARCHAR(255),
+//      await sequelize.query(`
+//       CREATE TABLE IF NOT EXISTS teacher_${instituteNumber} (
+//         id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+//         teacherName VARCHAR(200) NOT NULL,
+//         teacherAddress VARCHAR(255),
+//         teacherEmail VARCHAR(255) NOT NULL,
+//         teacherExperience VARCHAR(255),
+//         teacherPhoneNumber VARCHAR(255) NOT NULL,
+//         teacherJoined DATE,
+//         teacherSalary VARCHAR(100),
+//         teacherPhoto VARCHAR(255),
+//         teacherPassword VARCHAR(255),
+//         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+//         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+//       )
+//     `);
+
+//   next()
+     
+//     } catch (error: any) {
+//     console.error('Create student error:', error);
+//       return res.status(500).json({
+//         message: 'Server error',
+//          error: error.message,
+//         fullError: error,
+//         stack: error.stack
+
+//       });
+//  }
+//   }
+static async createTeacher(req: IExtendedRequest, res: Response, next: NextFunction) {
+  try {
+    const instituteNumber = req.user?.currentInstituteNumber;
+
+    if (!instituteNumber) {
+      return res.status(400).json({ message: "Institute number is missing" });
+    }
+
+    await sequelize.query(`
+      CREATE TABLE IF NOT EXISTS teacher_${instituteNumber}(
+        id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()), 
+        teacherName VARCHAR(255) NOT NULL, 
+        teacherEmail VARCHAR(255) NOT NULL , 
         teacherPhoneNumber VARCHAR(255) NOT NULL,
-        teacherJoined DATE,
+        teacherExperience VARCHAR(255), 
+        teacherJoinedDate DATE, 
         teacherSalary VARCHAR(100),
-        teacherPhoto VARCHAR(255),
+        teacherPhoto VARCHAR(255), 
         teacherPassword VARCHAR(255),
-        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        courseId VARCHAR(100) REFERENCES course_${instituteNumber}(id),
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )
     `);
 
-  next()
-     
-    } catch (error: any) {
-    console.error('Create student error:', error);
-      return res.status(500).json({
-        message: 'Server error',
-         error: error.message,
-        fullError: error,
-        stack: error.stack
-
-      });
- }
+    next();
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error creating teacher table" });
   }
+}
+
+
    // ==============================
   // Create Student Table 
   // ==============================
@@ -154,16 +187,20 @@ class InstituteController {
       }
 
       await sequelize.query(`
-          CREATE TABLE IF NOT EXISTS student_${instituteNumber} (
-          id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-          studentName VARCHAR(255) NOT NULL,
-          studentAddress VARCHAR(255),
-          studentPhoneNumber VARCHAR(255),
-          enrolledDate DATE,
-          studentImage VARCHAR(255),
-          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )
+         CREATE TABLE IF NOT EXISTS teacher_${instituteNumber}(
+  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()), 
+  teacherName VARCHAR(255) NOT NULL, 
+  teacherEmail VARCHAR(255) NOT NULL UNIQUE, 
+  teacherPhoneNumber VARCHAR(255) NOT NULL UNIQUE,
+  teacherExperience VARCHAR(255), 
+  joinedDate DATE, 
+  salary VARCHAR(100),
+  teacherPhoto VARCHAR(255), 
+  teacherPassword VARCHAR(255),
+  courseId VARCHAR(100) REFERENCES course_${instituteNumber}(id),
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+)
       `);
 
       next();

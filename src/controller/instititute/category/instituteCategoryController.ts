@@ -2,6 +2,7 @@ import { Response } from "express";
 import { IExtendedRequest } from "../../../middleWare/type.ts";
 import sequelize from "../../../database/connection.ts";
 import { QueryTypes } from "sequelize";
+// import { SELECT } from "sequelize/lib/query-types";
 
 
 class CategoryController {
@@ -24,9 +25,28 @@ static async createCategory(req:IExtendedRequest, res:Response){
         type:QueryTypes.INSERT
       }
       )
-      res.status(200).json({
-        message:'category added sucessfully'
-      })
+   const [categoryData]: {id:string, createdAt: Date}[] = await sequelize.query(
+  `SELECT id, createdAt FROM category_${instituteNumber} WHERE categoryName = ?`,
+  {
+    replacements: [categoryName],
+    type: QueryTypes.SELECT
+  }
+);
+
+if (!categoryData) {
+  return res.status(404).json({ message: "Category not found" });
+}
+
+res.status(200).json({
+  message: 'Category added successfully',
+  data: {
+    categoryName,
+    categoryDescription,
+    id: categoryData.id,
+    createdAt: categoryData.createdAt
+  }
+});
+
     } catch (error : any) {
          console.error('Create category error:', error);
       return res.status(500).json({
@@ -49,7 +69,8 @@ static async getAllCategories(req:IExtendedRequest,res:Response){
     })
      res.status(200).json({
         message:'category fetched sucessfully',
-        data: categories
+        data: categories,
+        instituteNumber
       })
 
   } catch (error : any) {

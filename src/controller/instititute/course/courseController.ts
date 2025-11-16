@@ -60,16 +60,26 @@ class CourseController {
       });
         }
     }
-    static async fetchCourse(req:IExtendedRequest, res:Response){
-        const instituteNumber = req.user?.currentInstituteNumber
+   static async fetchCourse(req: IExtendedRequest, res: Response) {
+  try {
+    const instituteNumber = req.user?.currentInstituteNumber;
 
-        const courseId = req.params.id
-        const courses = await sequelize.query(`SELECT * FROM course_${instituteNumber} JOIN category_${instituteNumber} ON course_${instituteNumber}.categoryId = category_${instituteNumber}.id`,{type:QueryTypes.SELECT})
-        res.status(200).json({
-            message : 'Course fetched',
-            data : courses
-        })
-    }
+   const courses = await sequelize.query(
+  `SELECT c.id,c.courseName FROM course_${instituteNumber} AS c JOIN category_${instituteNumber} AS cat ON c.categoryId = cat.id`,
+  { type: QueryTypes.SELECT }
+);
+
+
+    res.status(200).json({
+      message: "Course fetched",
+      data: courses,
+    });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+}
+
     static async getAllSingleCourse (req:IExtendedRequest, res:Response){
         try {
         const instituteNumber = req.user?.currentInstituteNumber

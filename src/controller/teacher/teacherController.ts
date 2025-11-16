@@ -52,10 +52,12 @@ const teacherLogin = async (req: Request, res: Response) => {
     // 5️ Send success response
     res.status(200).json({
       message: 'Login successful',
-      token,
+     
       data: {
         id: teacher.id,
         teacherEmail: teacher.teacherEmail,
+        teacherToken : token,
+        teacherInstituteNumber,
         // exclude password for security reasons
       },
     });
