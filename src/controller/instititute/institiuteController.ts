@@ -258,6 +258,36 @@ static async createTeacher(req: IExtendedRequest, res: Response, next: NextFunct
     }
 
   }
+    // ==============================
+  // Create course chaoter Table 
+  // ==============================
+  static async createCourseChatpterTable(req:IExtendedRequest, res:Response,next:NextFunction){
+    try {
+      const instituteNumber = req.user?.currentInstituteNumber;
+      if (!instituteNumber) {
+        return res.status(400).json({ message: "Institute number is missing" });
+      }
+    await sequelize.query(`CREATE TABLE IF NOT EXISTS course_chapter_${instituteNumber}(
+      id VARCHAR(35) PRIMARY KEY DEFAULT (UUID()),
+      chapterName VARCHAR(100) NOT NULL,
+      chapterDuration VARCHAR(100) NOT NULL,
+      chapterLevel ENUM('beginner', 'average', 'advance'),
+      courseId  REFERENCES course_${instituteNumber} DELETE ON CASCADE UPDATE ON CASCADE,
+      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )`)
+         next()
+
+    } catch (error:any) {
+      console.error('Create course error:', error);
+      return res.status(500).json({
+        message: 'Server error',
+       fullError: error, 
+        stack: error.stack
+      });
+    }
+  }
+
   // ==============================
   // Create Category Table 
   // ==============================
