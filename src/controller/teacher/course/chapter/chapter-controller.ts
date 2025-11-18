@@ -127,6 +127,49 @@ if (courseChapter.length > 0) {
       });
     }
   }
+// ====================================================
+// fetchCourseChapter
+// ====================================================
+static async deleteCourseChapter(req: IExtendedRequest, res: Response) {
+  try {
+    const instituteNumber = req.user?.currentInstituteNumber;
+    const { id } = req.params;
+
+    if (!instituteNumber) {
+      return res.status(400).json({
+        message: "Institute number missing from token",
+      });
+    }
+
+    if (!id) {
+      return res.status(400).json({
+        message: "Chapter id is required",
+      });
+    }
+
+    // Delete chapter
+    await sequelize.query(
+      `DELETE FROM course_chapter_${instituteNumber} WHERE id = ?`,
+      {
+        replacements: [id],
+        type: QueryTypes.DELETE,
+      }
+    );
+
+    return res.status(200).json({
+      message: "Chapter deleted successfully",
+      deletedId: id,
+    });
+
+  } catch (error: any) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+}
+
 }
 
 export default ChapterController;

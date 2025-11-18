@@ -1,4 +1,5 @@
 import { Table, DataType, Column, Model } from "sequelize-typescript";
+import { UserRole } from "../../middleWare/type.ts";
 
 @Table({
   tableName: 'users', // this is shown in ui form in xamp or database 
@@ -39,7 +40,7 @@ class User extends Model {
     type: DataType.ENUM('teacher', 'institute', 'super-admin', 'student'),
     defaultValue: 'student'
   })
-  declare role: string
+  declare role: UserRole
   @Column({
     type :DataType.STRING
   })

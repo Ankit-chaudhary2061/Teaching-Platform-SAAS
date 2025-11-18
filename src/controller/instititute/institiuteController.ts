@@ -258,7 +258,7 @@ static async createTeacher(req: IExtendedRequest, res: Response, next: NextFunct
     }
 
   }
-    // ==============================
+  // ==============================
   // Create course chaoter Table 
   // ==============================
   static async createCourseChatpterTable(req:IExtendedRequest, res:Response,next:NextFunction){
@@ -287,6 +287,38 @@ static async createTeacher(req: IExtendedRequest, res: Response, next: NextFunct
       });
     }
   }
+
+  // ==============================
+  // Create chaoter lessom  Table 
+  // ==============================
+static async createChapterLessonTable( req:IExtendedRequest, res:Response , next:NextFunction){
+  try {
+    const instituteNumber = req.user?.currentInstituteNumber;
+    if (!instituteNumber) {
+       return res.status(400).json({ message: "Institute number is missing" });
+      }
+    await sequelize.query(`CREATE TABLE IF NOT EXITS chapter_lesson_${instituteNumber}(
+      id VARCHAR(35) PRIMARY KEY DEFAULT (UUID()),
+      lessonName VARCHAR(100) NOT NULL,
+      lessonDescription TEXT,
+      lessonVedioUrl VARCHAR(400) NOT NULL,
+      lessonThumbnail Varchar(300) NOT NULL,
+      chapterId VARCHAR(30) REFERENCES course_chapter_${instituteNumber} (id) DELETE ON CASCADE UPDATE ON CASCADE,
+      createdAt TIMESTAMPDEFAULT CURRENT_TIMESTAMP,
+      updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )`)
+    next()
+
+  } catch (error :any) {
+    console.error('Create course error:', error);
+      return res.status(500).json({
+      message: 'Server error',
+      fullError: error, 
+      stack: error.stack
+    });
+  }
+
+}
 
   // ==============================
   // Create Category Table 

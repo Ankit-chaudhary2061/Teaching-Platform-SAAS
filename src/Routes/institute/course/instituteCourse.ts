@@ -9,6 +9,7 @@ import CourseController from "../../../controller/instititute/course/courseContr
 
 // online 
 import { cloudinary,storage } from "../../../services/cloudinaryConfig.ts";
+import { UserRole } from "../../../middleWare/type.ts";
 const upload = multer({
   storage: storage,
   limits: {
@@ -18,10 +19,10 @@ const upload = multer({
 
 const router: Router = express.Router()
 
-router.post('/course',MiddleWare.isLogedIn,upload.single('courseThumbnail'),CourseController.createCourse )
+router.post('/course',MiddleWare.isLogedIn,MiddleWare.restrictTo(UserRole.Institute),upload.single('courseThumbnail'),CourseController.createCourse )
 router.get('/course',MiddleWare.isLogedIn,CourseController.fetchCourse )
 router.get('/course/:id',MiddleWare.isLogedIn,CourseController.getAllSingleCourse )
-router.delete('/course/:id',MiddleWare.isLogedIn,CourseController.deleteCourse )
+router.delete('/course/:id',MiddleWare.isLogedIn,MiddleWare.restrictTo(UserRole.Institute,UserRole.Teacher),CourseController.deleteCourse )
 
 
 

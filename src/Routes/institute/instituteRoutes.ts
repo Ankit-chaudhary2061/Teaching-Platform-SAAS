@@ -13,6 +13,7 @@ router.post(
   InstituteController.createStudent,
   InstituteController.createCategoryTable,
   InstituteController.createCourseChatpterTable,
+  InstituteController.createChapterLessonTable,
   InstituteController.createCourseTable
 );
 
