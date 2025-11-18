@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../database/model/userModels.ts";
-import { IExtendedRequest } from "./type.ts";
+import { IExtendedRequest, UserRole } from "./type.ts";
 
 class MiddleWare {
   static async isLogedIn(req: IExtendedRequest, res: Response, next: NextFunction) {
@@ -17,7 +17,7 @@ class MiddleWare {
       }
 
       const data = await User.findByPk(decoded.id, {
-        attributes: ["id", "currentInstituteNumber"],
+        attributes: ["id", "currentInstituteNumber", "role"],
       });
 
       if (!data) {
@@ -28,6 +28,7 @@ class MiddleWare {
       req.user = {
         id: data.id,
         currentInstituteNumber: data.currentInstituteNumber,
+        role:data.role
       };
 console.log("👉 req.user:", req.user);
 
@@ -36,7 +37,26 @@ console.log("👉 req.user:", req.user);
       next();
     });
   }
+   // ==================================
+  // Role Restriction
+  // ==================================
+  static restrictTo(...roles:UserRole[]) {
+    return (req: IExtendedRequest, res: Response, next: NextFunction) => {
+      const userRole = req.user?.role as UserRole;
+
+      if (roles.includes(userRole)) {
+      next();
+
+      }else{}
+        return res.status(403).json({
+          message: "You do not have permission to perform this action",
+        });
+      }
+
+     
+  }
 }
+
 
 export default MiddleWare;
 

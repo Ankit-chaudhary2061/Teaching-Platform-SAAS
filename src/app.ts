@@ -6,7 +6,8 @@ import instituteCourseRoutes from './Routes/institute/course/instituteCourse.ts'
 import instituteCategoryRoutes from './Routes/institute/category/instituteCategoreyRoutes.ts';
 import instituteTeacherRoutes from './Routes/institute/teacher/instituteTeacherRoutes.ts';
 import teacherRoute from './Routes/teacher/teacherRoute.ts';
-
+import lessonRoute from './Routes/teacher/course/lesson/course-lesson.ts'
+import chapterRoute from './Routes/teacher/course/chapter/course-chapter-route.ts'
 const app = express();
 
 
@@ -29,5 +30,10 @@ app.use('/api/institute', instituteCategoryRoutes);
 app.use('/api/institute', instituteTeacherRoutes);
 // teacher Route
 app.use('/api/teacher', teacherRoute);
+app.use('/api/teacher/course', lessonRoute);
+app.use('/api/teacher/course', chapterRoute);
+
+
+
 
 export default app;
