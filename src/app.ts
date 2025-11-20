@@ -8,6 +8,9 @@ import instituteTeacherRoutes from './Routes/institute/teacher/instituteTeacherR
 import teacherRoute from './Routes/teacher/teacherRoute.ts';
 import lessonRoute from './Routes/teacher/course/lesson/course-lesson.ts'
 import chapterRoute from './Routes/teacher/course/chapter/course-chapter-route.ts'
+import studentInstituteRoute from './Routes/student/institute/student-student-route.ts'
+import studentCartRoutes from './Routes/student/cart/student-cart-routes.ts'
+
 const app = express();
 
 
@@ -32,6 +35,11 @@ app.use('/api/institute', instituteTeacherRoutes);
 app.use('/api/teacher', teacherRoute);
 app.use('/api/teacher/course', lessonRoute);
 app.use('/api/teacher/course', chapterRoute);
+// student Route
+app.use('/api/student', studentInstituteRoute);
+app.use('/api/student', studentCartRoutes);
+
+
 
 
 

@@ -117,7 +117,7 @@ if (courseChapter.length > 0) {
 
       return res.status(200).json({
         message: "Course chapters fetched successfully",
-        chapters,
+       data : chapters,
       });
     } catch (error: any) {
       console.error(error);
@@ -128,7 +128,7 @@ if (courseChapter.length > 0) {
     }
   }
 // ====================================================
-// fetchCourseChapter
+// deleteCourseChapter
 // ====================================================
 static async deleteCourseChapter(req: IExtendedRequest, res: Response) {
   try {

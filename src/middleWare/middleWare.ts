@@ -37,6 +37,21 @@ console.log("👉 req.user:", req.user);
       next();
     });
   }
+  // ==================================
+  // Role Restriction
+  // ==================================
+  static changeUserIdForTableName (req:IExtendedRequest,res:Response, next:NextFunction){
+ if(req.user && req.user.id){
+         const newUserId =  req.user.id.split("-").join("_") 
+         req.user = {id:newUserId,role:req.user.role}
+         console.log(req.user,"RequserId")
+        //  console.log(req.user?.id.split("-").join("_") ,"data")
+        next()
+        }
+
+
+  }
+
    // ==================================
   // Role Restriction
   // ==================================
